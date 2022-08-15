@@ -1,4 +1,4 @@
-# Flask API Interaction & Data Handling
+# Flask API Interaction & Data Handling for NLP Sentiment Analysis
 
 ## Abstract
 ##### How does sentiment score relate to review score?
