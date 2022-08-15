@@ -34,20 +34,20 @@ Use the 'API Handler' file to see in-depth function calls. The links below demon
 ### GET: Retrieve a Sample From the SQL Database
 <http://127.0.0.1:5000/db/>
 This function returns a sample of the SQL database because the entire database is over 10,000 reviews long.
-![get_db](github_link)
-
-### GET: Retrieve the Sentiment Score (NLP)
-<http://127.0.0.1:5000/db/sentiment>
-This function returns the sentiment score of a sample of reviews, and adds a sentiment score to each sampled review.
-![get_db](github_link)
+![get_db](https://github.com/VeniceHartwell/proj-6/blob/main/images/get_db.png)
 
 ### GET: Retrieve all Reviews Matching a Username
 <http://127.0.0.1:5000/db/<reviewername>>
 Where <reviewerName> is the name you would like to search. 
 This function returns every review matching the name of the reviewer provided.
-![get_db](github_link)
+![get_db_reviewer](https://github.com/VeniceHartwell/proj-6/blob/main/images/get_db_reviewer.png)
+
+### GET: Retrieve the Sentiment Score (NLP)
+<http://127.0.0.1:5000/db/sentiment>
+This function returns the sentiment score of a sample of reviews, and adds a sentiment score to each sampled review.
+![get_db_sentiment](https://github.com/VeniceHartwell/proj-6/blob/main/images/get_db_sentiment.png)
 
 ### POST: Add a Review
 <http://127.0.0.1:5000/db/addReview?reviewerName=Joe%20R.&?helpful=[1:1]&?reviewText=It%20was%20pretty%20good,%20but%20I%20expected%20more.%20I%20do%20not%20like%20the%20product&?overall=2.0&?summary=Less%20than%20expected&?reviewTime=today>"
 This function adds a new review, based on the user's input criteria (see the final section of the API Handler for a detailed example), to the SQL database.
-![get_db](github_link)
+![get_db](https://github.com/VeniceHartwell/proj-6/blob/main/images/post_addReview.png)
