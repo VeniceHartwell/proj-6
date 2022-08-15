@@ -26,6 +26,7 @@ def greeting ():
     return f"Test successful"
 
 
+
 # display original database
 @app.route("/db")
 def database():
@@ -39,6 +40,7 @@ def database():
     new_dict = df.to_dict(orient="records")
 
     return jsonify(new_dict)
+
 
 
 # display all reviews from the database matching the given name
@@ -55,6 +57,7 @@ def databaseName(reviewerName):
     new_dict = df.to_dict(orient="records")
 
     return jsonify(new_dict)
+
 
 
 # display database with added sentiment score, using NLP on review text
@@ -117,6 +120,7 @@ def sentiment():
     return jsonify(new_dict)
 
 
+
 @app.route("/db/addReview", methods=["POST"])
 def under_decorator ():
 
@@ -132,6 +136,7 @@ def under_decorator ():
     reviewTime = request.form.get("reviewTime")
         
     return sqt.add_review(reviewerName, helpful, reviewText, overall, summary, reviewTime)
+
 
 
 # run the flask app in debug mode
