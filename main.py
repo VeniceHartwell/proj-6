@@ -1,5 +1,5 @@
 # libraries for API
-from flask import Flask
+from flask import Flask, request
 import random
 from flask import jsonify
 
@@ -13,6 +13,7 @@ from statistics import mean
 import pymysql
 import pandas as pd
 from config.sqlconfig import engine
+import tools.sqltools as sqt
 
 
 # init flask
@@ -34,19 +35,26 @@ def database():
     SELECT reviewerName, helpful, reviewText, overall, summary, reviewTime FROM reviews ORDER BY helpful DESC LIMIT 100;
     """, engine)
     
-    return str(df)
+    # df to dict
+    new_dict = df.to_dict(orient="records")
+
+    return jsonify(new_dict)
 
 
 # display all reviews from the database matching the given name
-@app.route("/db/{reviewerName}") # FIX: HOW TO WRITE PARAM?
-def database():
+@app.route("/db/<reviewerName>") 
+def databaseName(reviewerName):
     
-    df = pd.read_sql_query( # FIX: HOW TO WRITE PARAM?
-    """
-    SELECT reviewerName, helpful, reviewText, overall, summary FROM reviews WHERE reviewerName == reviewerName ORDER BY helpful DESC LIMIT 100;
+    df = pd.read_sql_query(
+    f"""
+    SELECT reviewerName, helpful, reviewText, overall, summary FROM reviews 
+    WHERE reviewerName = '{reviewerName}' ORDER BY helpful DESC LIMIT 100;
     """, engine)
     
-    return str(df)
+    # df to dict
+    new_dict = df.to_dict(orient="records")
+
+    return jsonify(new_dict)
 
 
 # display database with added sentiment score, using NLP on review text
@@ -56,7 +64,7 @@ def sentiment():
     # SQL -> DF
     df = pd.read_sql_query(
     """
-    SELECT reviewerName, helpful, reviewText, overall, summary FROM reviews ORDER BY helpful DESC LIMIT 100;
+    SELECT reviewerName, helpful, reviewText, overall, summary FROM reviews ORDER BY helpful DESC LIMIT 50;
     """, engine)
 
     # init vars to use in function
@@ -99,49 +107,33 @@ def sentiment():
 
     print('average difference between user\'s review score (out of 5) vs review sentiment score: ',
         mean(sentiment_comparison))
-    return str(df_new.head())
-
-
-# display database with new review added
-@app.route("/db/sentiment")
-def sentiment(): # FIX: ADD PARAMS OR DATA HERE?
     
-    # SQL -> DF
-    df = pd.read_sql_query(
-    """
-    SELECT reviewerName, helpful, reviewText, overall, summary, reviewTime FROM reviews ORDER BY helpful DESC;
-    """, engine)
+    # df to dict
+    new_dict = df_new.to_dict(orient="records")
+    
+    # add average of sentiment score to top of list returned in API call
+    new_dict.insert(0, f'average difference between user\'s review score (out of 5) vs review sentiment score: {mean(sentiment_comparison)}')
 
-    # add new review to df
-    dict_to_merge = {"reviewerName":reviewerName, "helpful":helpful, 
-        "reviewText":reviewText, "overall":overall, "summary":summary} # add review to new dict
-    df2 = pd.DataFrame(dict_to_merge) # translate dict to df
-    df_new = pd.concat([df, df2], axis=1) # concatenate dataframes
-    return str(df.tail()) #display df with new review
+    return jsonify(new_dict)
+
+
+@app.route("/db/addReview", methods=["POST"])
+def under_decorator ():
+
+    # REPLACE WHEN FUNCTION WORKS
+    # data = request.form
+    # reviewerName = data["reviewerName"]
+
+    reviewerName = request.form.get("reviewerName")
+    helpful = request.form.get("helpful")
+    reviewText = request.form.get("reviewText")
+    overall = request.form.get("overall")
+    summary = request.form.get("summary")
+    reviewTime = request.form.get("reviewTime")
+        
+    return sqt.add_review(reviewerName, helpful, reviewText, overall, summary, reviewTime)
 
 
 # run the flask app in debug mode
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-'''
-# References from previous project
-
-@app.route("/line/<name>")
-def all_from_mongo (name):
-    lines = mongo.all_sentences(name)
-    return jsonify(lines)
-
-@app.route("/database")
-def database():
-    
-    myclient = MongoClient("mongodb://localhost:27017/")
-    #mongoclient
-    
-    mydb = myclient["Ironhack"]
-    mycol = mydb["amazon_reviews"]
-    #database and coll
-    
-    return str(mycol.find_one())
-'''
